@@ -16,8 +16,8 @@ allprojects {
     apply(plugin = "org.jetbrains.kotlin.plugin.spring")
     apply(plugin = "pl.allegro.tech.build.axion-release")
     apply(plugin = "org.springframework.boot")
-    apply(plugin = "idea")
     apply(plugin = "jvm-test-suite")
+    apply(plugin = "idea")
 
     group = "me.project"
     version = scmVersion.version
@@ -136,7 +136,7 @@ allprojects {
 
         // ---
 
-        //TODO: workarround - testIntegration handler is not registered in root file
+        //TODO: workaround - testIntegration handler is not registered in root file
         configurations["testIntegrationImplementation"](group = "org.springframework.boot", name= "spring-boot-starter-test", version = "${project.ext["springBootVersion"]}")
         configurations["testIntegrationImplementation"](group = "io.kotest.extensions", name = "kotest-extensions-spring", version = "${project.ext["kotestSpringVersion"]}")
         configurations["testIntegrationImplementation"](group = "com.ninja-squad", name = "springmockk", version = "${project.ext["mockkSpringVersion"]}")
@@ -152,4 +152,5 @@ gradle.buildFinished {
     project.buildDir.deleteRecursively()
 }
 
+// Foldable ProjectView
 //.gitignore gradlew gradlew.bat gradle .idea .git
