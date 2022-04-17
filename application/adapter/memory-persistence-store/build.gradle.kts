@@ -1,6 +1,5 @@
-group = "${group}.core"
+group = "${group}.adapter.persistence"
 
 dependencies {
-    implementation(project(":core-domain"))
     implementation(project(":application-ports"))
 }

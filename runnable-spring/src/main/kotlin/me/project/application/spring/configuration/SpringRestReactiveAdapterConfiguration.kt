@@ -1,0 +1,9 @@
+package me.project.application.spring.configuration
+
+import me.project.adapter.spring.reactive.SpringRestReactiveAutoConfiguration
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration
+import org.springframework.context.annotation.Configuration
+
+@Configuration
+@ImportAutoConfiguration(SpringRestReactiveAutoConfiguration::class)
+class SpringRestReactiveAdapterConfiguration

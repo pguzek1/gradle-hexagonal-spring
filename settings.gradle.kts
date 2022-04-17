@@ -1,10 +1,41 @@
 rootProject.name = "hexagonal"
-rootProject.projectDir = file("./")
 
-include(":application:core:domain")
-findProject(":application:core:domain")?.name = "domain"
+// + -------------- +
+// |    runnable    |
+// + -------------- +
+include(":runnable-spring")
+project(":runnable-spring").projectDir = file("runnable-spring")
+project(":runnable-spring").name = "runnable-spring"
 
-include(":application:ports")
-findProject(":application:core:domain")?.name = "domain"
-include("application:core:services")
-findProject(":application:core:services")?.name = "services"
+
+// + -------------- +
+// |      core      |
+// + -------------- +
+include(":application-core-domain")
+project(":application-core-domain").projectDir = file("application/core/domain")
+project(":application-core-domain").name = "core-domain"
+
+include(":application-core-services")
+project(":application-core-services").projectDir = file("application/core/services")
+project(":application-core-services").name = "core-services"
+
+
+// + -------------- +
+// |     ports      |
+// + -------------- +
+//TODO: split ports-driven, ports-driving, ports-model
+include(":application-ports")
+project(":application-ports").projectDir = file("application/ports")
+project(":application-ports").name = "application-ports"
+
+
+// + -------------- +
+// |    adapter     |
+// + -------------- +
+include(":adapter-spring-rest-reactive")
+project(":adapter-spring-rest-reactive").projectDir = file("application/adapter/spring-rest-reactive")
+project(":adapter-spring-rest-reactive").name = "adapter-spring-rest-reactive"
+
+include(":adapter-memory-persistence-store")
+project(":adapter-memory-persistence-store").projectDir = file("application/adapter/memory-persistence-store")
+project(":adapter-memory-persistence-store").name = "adapter-memory-persistence-store"

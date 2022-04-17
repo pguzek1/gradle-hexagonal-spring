@@ -1,4 +1,5 @@
 group = "${group}.core"
 
 dependencies {
+
 }

@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -18,8 +20,17 @@ allprojects {
 
     ext.apply {
         set("kotlinVersion", "1.6.20")
-        set("kotlinxVersion", "1.6.0")
-        set("kotestVersion", "5.2.2")
+        set("kotlinxVersion", "1.6.1")
+        set("kotlinLoggingVersion", "2.1.20")
+        set("kotestVersion", "5.2.3")
+        set("kotestSpringVersion", "1.1.0")
+        set("mockkVersion", "1.12.3")
+        set("mockkSpringVersion", "3.1.1")
+        set("reactorVersion", "3.4.17")
+        set("reactorKotlinVersion", "1.1.6")
+        set("springBootVersion", "2.6.6")
+        set("springFrameworkVersion", "5.3.18")
+        set("jacksonVersion", "2.13.2")
     }
 
     repositories {
@@ -30,9 +41,14 @@ allprojects {
         implementation(group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "${project.ext["kotlinVersion"]}")
         implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version = "${project.ext["kotlinVersion"]}")
 
+        implementation(group ="io.github.microutils", name = "kotlin-logging", version = "${project.ext["kotlinLoggingVersion"]}")
+
         testImplementation(group = "io.kotest", name = "kotest-runner-junit5", version = "${project.ext["kotestVersion"]}")
         testImplementation(group = "io.kotest", name = "kotest-assertions-core", version = "${project.ext["kotestVersion"]}")
         testImplementation(group = "io.kotest", name = "kotest-property", version = "${project.ext["kotestVersion"]}")
+        testImplementation(group = "io.mockk", name = "mockk", version = "${project.ext["mockkVersion"]}")
+
+        testImplementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version = "${project.ext["kotlinxVersion"]}")
     }
 
     configure<JavaPluginExtension> {
@@ -44,36 +60,6 @@ allprojects {
         useJUnitPlatform()
     }
 
-//    val testIntegration: SourceSet by sourceSets.creating {
-//        val integrationProjectPath = "${projectDir}/src/testIntegration"
-//        java {
-//            srcDirs("${integrationProjectPath}/java", "${integrationProjectPath}/kotlin")
-//        }
-//        resources {
-//            srcDirs("${integrationProjectPath}/resources", "${projectDir}/src/test/resources")
-//        }
-//        compileClasspath += sourceSets.main.get().output + sourceSets.test.get().output
-//        runtimeClasspath += sourceSets.main.get().output + sourceSets.test.get().output
-//    }
-//
-//    configurations {
-//        get(testIntegration.implementationConfigurationName).extendsFrom(configurations.testImplementation.get())
-//        get(testIntegration.compileOnlyConfigurationName).extendsFrom(configurations.testCompileOnly.get())
-//        get(testIntegration.runtimeOnlyConfigurationName).extendsFrom(configurations.testRuntimeOnly.get())
-//    }
-
-//    tasks.register<Test>("testIntegration") {
-//        description = "Runs integration tests."
-//        group = "verification"
-//        useJUnitPlatform()
-//
-//        testClassesDirs += sourceSets["testIntegration"].output.classesDirs
-//        classpath += sourceSets["testIntegration"].runtimeClasspath
-//        classpath += sourceSets["testIntegration"].output
-//
-//        shouldRunAfter(tasks.test)
-//    }
-
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict")
@@ -83,17 +69,11 @@ allprojects {
 
     testing {
         suites {
+            @Suppress("UnstableApiUsage")
             val testIntegration by registering(JvmTestSuite::class) {
                 testType.set(TestSuiteType.INTEGRATION_TEST)
-                val testIntegrationPath = "${projectDir}/src/testIntegration"
 
                 sources {
-                    java {
-                        setSrcDirs(setOf("${testIntegrationPath}/kotlin", "${testIntegrationPath}/java"))
-                    }
-                    resources {
-                        setSrcDirs(setOf("${testIntegrationPath}/resources"))
-                    }
                     compileClasspath += sourceSets.main.get().output + sourceSets.test.get().output
                     runtimeClasspath += sourceSets.main.get().output + sourceSets.test.get().output
                 }
@@ -107,21 +87,29 @@ allprojects {
                 targets {
                     all {
                         testTask.configure {
-                            useJUnitPlatform {
-                                includeTags("integration", "e2e")
+                            useJUnitPlatform()
+
+                            testClassesDirs += sourceSets["testIntegration"].output.classesDirs
+                            classpath += sourceSets["testIntegration"].runtimeClasspath
+                            classpath += sourceSets["testIntegration"].output
+
+
+                            testLogging {
+                                exceptionFormat = TestExceptionFormat.FULL
+                                showExceptions = true
+                                showStandardStreams = true
+                                events(TestLogEvent.PASSED, TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT, TestLogEvent.STANDARD_ERROR)
                             }
-//                            filter {
-//                                isFailOnNoMatchingTests = false
-//                            }
-//                            testLogging {
-//                                exceptionFormat = FULL
-//                                showExceptions = true
-//                                showStandardStreams = true
-//                                events(PASSED, FAILED, SKIPPED, STANDARD_OUT, STANDARD_ERROR)
-//                            }
-//                            shouldRunAfter(test)
-//                            finalizedBy("jacocoTestReport")
+
+                            shouldRunAfter(tasks.test)
                         }
+                    }
+                }
+
+                idea {
+                    module {
+                        testSourceDirs.addAll(sources.java.srcDirs)
+                        testResourceDirs.addAll(sources.resources.srcDirs)
                     }
                 }
             }
@@ -131,17 +119,15 @@ allprojects {
     tasks.check {
         dependsOn(tasks.getByName("testIntegration"))
     }
-
-    idea {
-        module {
-            testSourceDirs.addAll(project.sourceSets["testIntegration"].java.srcDirs)
-            testResourceDirs.addAll(project.sourceSets["testIntegration"].resources.srcDirs)
-        }
-    }
 }
 
 subprojects {
 
+}
+
+//TODO: exclude rootProject build directory
+gradle.buildFinished {
+    project.buildDir.deleteRecursively()
 }
 
 //.gitignore gradlew gradlew.bat gradle .idea .git
