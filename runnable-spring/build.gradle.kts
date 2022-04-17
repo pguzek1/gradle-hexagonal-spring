@@ -3,7 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.spring") version "1.6.20"
 }
 
-group = "${group}.configuration"
+group = "${group}.runnable"
 
 dependencies {
     implementation(project(":application-ports"))

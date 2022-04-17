@@ -1,4 +1,4 @@
-package me.project.application.spring
+package me.project.runnable.spring
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe

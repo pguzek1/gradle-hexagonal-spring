@@ -1,4 +1,4 @@
-package me.project.application.spring.configuration
+package me.project.runnable.spring.configuration
 
 import me.project.adapter.persistence.memory.UserRepository
 import org.springframework.context.annotation.Bean
