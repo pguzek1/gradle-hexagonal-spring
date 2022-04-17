@@ -4,9 +4,6 @@ on:
   pull_request:
   push:
 
-permissions:
-  contents: read
-
 jobs:
   qodana:
     runs-on: ubuntu-latest
