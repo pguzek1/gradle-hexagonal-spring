@@ -17,7 +17,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    - name: Test with Gradle
+    - name: Check Gradle project
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: check
+        arguments: clean check
