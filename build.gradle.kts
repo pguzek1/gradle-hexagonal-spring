@@ -39,6 +39,7 @@ allprojects {
 
         set("springBootVersion", "2.6.6")
         set("springFrameworkVersion", "5.3.18")
+//        set("springSecurityVersion", "5.6.2")
 
         set("jacksonVersion", "2.13.2")
     }
@@ -123,6 +124,10 @@ allprojects {
         implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version = "${project.ext["kotlinVersion"]}")
 
         implementation(group = "io.github.microutils", name = "kotlin-logging", version = "${project.ext["kotlinLoggingVersion"]}")
+
+        implementation(group = "org.springframework", name = "spring-tx", version = "${project.ext["springFrameworkVersion"]}")
+        implementation(group = "org.springframework", name = "spring-webflux", version = "${project.ext["springFrameworkVersion"]}")
+//        implementation(group = "org.springframework.security", name = "spring-security-core", version = "${project.ext["springSecurityVersion"]}")
 
         // ---
 
