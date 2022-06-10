@@ -3,45 +3,43 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.6.20"
-    id("org.jetbrains.kotlin.plugin.spring") version "1.6.20"
-    id("pl.allegro.tech.build.axion-release") version "1.13.6"
-    id("org.springframework.boot") version "2.6.6"
+    id("org.jetbrains.kotlin.jvm") version "1.6.21"
+    id("org.jetbrains.kotlin.plugin.spring") version "1.6.21" apply false
+    id("org.springframework.boot") version "2.7.0" apply false
+    id("pl.allegro.tech.build.axion-release") version "1.13.14"
     id("jvm-test-suite")
     id("idea")
 }
 
 allprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
-    apply(plugin = "org.jetbrains.kotlin.plugin.spring")
     apply(plugin = "pl.allegro.tech.build.axion-release")
-    apply(plugin = "org.springframework.boot")
     apply(plugin = "jvm-test-suite")
     apply(plugin = "idea")
 
-    group = "me.project"
+    group = "org.example.project"
     version = scmVersion.version
 
     ext.apply {
         set("javaVersion", JavaVersion.VERSION_17)
-        set("kotlinVersion", "1.6.20")
+        set("kotlinVersion", "1.6.21")
 
-        set("kotlinxVersion", "1.6.1")
-        set("kotlinLoggingVersion", "2.1.20")
+        set("kotlinxVersion", "1.6.2")
+        set("kotlinLoggingVersion", "2.1.23")
 
-        set("kotestVersion", "5.2.3")
-        set("kotestSpringVersion", "1.1.0")
-        set("mockkVersion", "1.12.3")
+        set("kotestVersion", "5.3.0")
+        set("kotestSpringVersion", "1.1.1")
+        set("mockkVersion", "1.12.4")
         set("mockkSpringVersion", "3.1.1")
 
-        set("reactorVersion", "3.4.17")
+        set("reactorVersion", "3.4.18")
         set("reactorKotlinVersion", "1.1.6")
 
-        set("springBootVersion", "2.6.6")
-        set("springFrameworkVersion", "5.3.18")
-//        set("springSecurityVersion", "5.6.2")
+        set("springBootVersion", "2.7.0")
+        set("springFrameworkVersion", "5.3.20")
+//        set("springSecurityVersion", "5.7.1")
 
-        set("jacksonVersion", "2.13.2")
+        set("jacksonVersion", "2.13.3")
     }
 
     repositories {
@@ -55,6 +53,13 @@ allprojects {
 
     tasks.withType<Test> {
         useJUnitPlatform()
+
+        testLogging {
+            exceptionFormat = TestExceptionFormat.FULL
+            showExceptions = true
+            showStandardStreams = true
+            events(TestLogEvent.PASSED, TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT, TestLogEvent.STANDARD_ERROR)
+        }
     }
 
     tasks.withType<KotlinCompile> {
@@ -71,9 +76,13 @@ allprojects {
                 val taskName = "testIntegration"
                 testType.set(TestSuiteType.INTEGRATION_TEST)
 
+                dependencies {
+                    implementation(project)
+                }
+
                 sources {
-                    compileClasspath += sourceSets.main.get().output + sourceSets.test.get().output
-                    runtimeClasspath += sourceSets.main.get().output + sourceSets.test.get().output
+                    compileClasspath += sourceSets.test.get().output
+                    runtimeClasspath += sourceSets.test.get().output
                 }
 
                 configurations {
@@ -85,22 +94,12 @@ allprojects {
                 targets {
                     all {
                         testTask.configure {
-                            useJUnitPlatform()
-
                             testClassesDirs += sourceSets[taskName].output.classesDirs
+
                             classpath += sourceSets[taskName].runtimeClasspath
                             classpath += sourceSets[taskName].output
 
-
-                            testLogging {
-                                exceptionFormat = TestExceptionFormat.FULL
-                                showExceptions = true
-                                showStandardStreams = true
-                                events(TestLogEvent.PASSED, TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT, TestLogEvent.STANDARD_ERROR)
-                            }
-
                             shouldRunAfter(tasks.test)
-
                         }
                     }
                 }
@@ -125,10 +124,6 @@ allprojects {
 
         implementation(group = "io.github.microutils", name = "kotlin-logging", version = "${project.ext["kotlinLoggingVersion"]}")
 
-        implementation(group = "org.springframework", name = "spring-tx", version = "${project.ext["springFrameworkVersion"]}")
-        implementation(group = "org.springframework", name = "spring-webflux", version = "${project.ext["springFrameworkVersion"]}")
-//        implementation(group = "org.springframework.security", name = "spring-security-core", version = "${project.ext["springSecurityVersion"]}")
-
         // ---
 
         testImplementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version = "${project.ext["kotlinxVersion"]}")
@@ -138,23 +133,32 @@ allprojects {
         testImplementation(group = "io.kotest", name = "kotest-property", version = "${project.ext["kotestVersion"]}")
 
         testImplementation(group = "io.mockk", name = "mockk", version = "${project.ext["mockkVersion"]}")
-
-        // ---
-
-        //TODO: workaround - testIntegration handler is not registered in root file
-        configurations["testIntegrationImplementation"](group = "org.springframework.boot", name= "spring-boot-starter-test", version = "${project.ext["springBootVersion"]}")
-        configurations["testIntegrationImplementation"](group = "io.kotest.extensions", name = "kotest-extensions-spring", version = "${project.ext["kotestSpringVersion"]}")
-        configurations["testIntegrationImplementation"](group = "com.ninja-squad", name = "springmockk", version = "${project.ext["mockkSpringVersion"]}")
     }
 }
 
 subprojects {
+    if (name.contains("spring")) {
+        if (name.contains("runnable")) apply(plugin = "org.springframework.boot")
+        apply(plugin = "org.jetbrains.kotlin.plugin.spring")
 
+
+        dependencies {
+            implementation(group = "org.springframework", name = "spring-tx", version = "${project.ext["springFrameworkVersion"]}")
+            implementation(group = "org.springframework", name = "spring-webflux", version = "${project.ext["springFrameworkVersion"]}")
+//            implementation(group = "org.springframework.security", name = "spring-security-core", version = "${project.ext["springSecurityVersion"]}")
+
+            //FIXME: testIntegration handler is not registered in root file (workaround)
+            "testIntegrationImplementation"(group = "org.springframework.boot", name= "spring-boot-starter-test", version = "${project.ext["springBootVersion"]}")
+            "testIntegrationImplementation"(group = "io.kotest.extensions", name = "kotest-extensions-spring", version = "${project.ext["kotestSpringVersion"]}")
+            "testIntegrationImplementation"(group = "com.ninja-squad", name = "springmockk", version = "${project.ext["mockkSpringVersion"]}")
+        }
+    }
 }
 
-//TODO: exclude rootProject build directory
+//FIXME: exclude rootProject build directory (alternative will be available in gradle 7.6)
+tasks.forEach { it.enabled = false }
 gradle.buildFinished {
-    project.buildDir.deleteRecursively()
+    buildDir.deleteRecursively()
 }
 
 // Foldable ProjectView
