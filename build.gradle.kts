@@ -1,11 +1,17 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.api.JavaVersion.VERSION_17
+import org.gradle.api.attributes.TestSuiteType.INTEGRATION_TEST
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR
+import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.6.21"
-    id("org.jetbrains.kotlin.plugin.spring") version "1.6.21" apply false
-    id("org.springframework.boot") version "2.7.0" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.7.10"
+    id("org.jetbrains.kotlin.plugin.spring") version "1.7.10" apply false
+    id("org.springframework.boot") version "2.7.1" apply false
     id("pl.allegro.tech.build.axion-release") version "1.13.14"
     id("jvm-test-suite")
     id("idea")
@@ -21,23 +27,23 @@ allprojects {
     version = scmVersion.version
 
     ext.apply {
-        set("javaVersion", JavaVersion.VERSION_17)
-        set("kotlinVersion", "1.6.21")
+        set("javaVersion", VERSION_17)
+        set("kotlinVersion", "1.7.10")
 
-        set("kotlinxVersion", "1.6.2")
+        set("kotlinxVersion", "1.6.4")
         set("kotlinLoggingVersion", "2.1.23")
 
-        set("kotestVersion", "5.3.0")
+        set("kotestVersion", "5.3.2")
         set("kotestSpringVersion", "1.1.1")
         set("mockkVersion", "1.12.4")
         set("mockkSpringVersion", "3.1.1")
 
-        set("reactorVersion", "3.4.18")
-        set("reactorKotlinVersion", "1.1.6")
+        set("reactorVersion", "3.4.21")
+        set("reactorKotlinVersion", "1.1.7")
 
-        set("springBootVersion", "2.7.0")
-        set("springFrameworkVersion", "5.3.20")
-//        set("springSecurityVersion", "5.7.1")
+        set("springBootVersion", "2.7.1")
+        set("springFrameworkVersion", "5.3.21")
+//        set("springSecurityVersion", "5.7.2")
 
         set("jacksonVersion", "2.13.3")
     }
@@ -55,10 +61,10 @@ allprojects {
         useJUnitPlatform()
 
         testLogging {
-            exceptionFormat = TestExceptionFormat.FULL
+            exceptionFormat = FULL
             showExceptions = true
             showStandardStreams = true
-            events(TestLogEvent.PASSED, TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT, TestLogEvent.STANDARD_ERROR)
+            events(PASSED, FAILED, SKIPPED, STANDARD_OUT, STANDARD_ERROR)
         }
     }
 
@@ -74,7 +80,7 @@ allprojects {
             @Suppress("UnstableApiUsage")
             val testIntegration by registering(JvmTestSuite::class) {
                 val taskName = "testIntegration"
-                testType.set(TestSuiteType.INTEGRATION_TEST)
+                testType.set(INTEGRATION_TEST)
 
                 dependencies {
                     implementation(project)
@@ -143,8 +149,8 @@ subprojects {
 
 
         dependencies {
-            implementation(group = "org.springframework", name = "spring-tx", version = "${project.ext["springFrameworkVersion"]}")
-            implementation(group = "org.springframework", name = "spring-webflux", version = "${project.ext["springFrameworkVersion"]}")
+//            implementation(group = "org.springframework", name = "spring-tx", version = "${project.ext["springFrameworkVersion"]}")
+//            implementation(group = "org.springframework", name = "spring-webflux", version = "${project.ext["springFrameworkVersion"]}")
 //            implementation(group = "org.springframework.security", name = "spring-security-core", version = "${project.ext["springSecurityVersion"]}")
 
             //FIXME: testIntegration handler is not registered in root file (workaround)
