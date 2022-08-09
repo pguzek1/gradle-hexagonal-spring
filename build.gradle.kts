@@ -11,8 +11,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.7.10"
     id("org.jetbrains.kotlin.plugin.spring") version "1.7.10" apply false
-    id("org.springframework.boot") version "2.7.1" apply false
-    id("pl.allegro.tech.build.axion-release") version "1.13.14"
+    id("org.springframework.boot") version "2.7.2" apply false
+    id("pl.allegro.tech.build.axion-release") version "1.14.0"
     id("jvm-test-suite")
     id("idea")
 }
@@ -33,16 +33,16 @@ allprojects {
         set("kotlinxVersion", "1.6.4")
         set("kotlinLoggingVersion", "2.1.23")
 
-        set("kotestVersion", "5.3.2")
-        set("kotestSpringVersion", "1.1.1")
-        set("mockkVersion", "1.12.4")
+        set("kotestVersion", "5.4.1")
+        set("kotestSpringVersion", "1.1.2")
+        set("mockkVersion", "1.12.5")
         set("mockkSpringVersion", "3.1.1")
 
-        set("reactorVersion", "3.4.21")
+        set("reactorVersion", "3.4.22")
         set("reactorKotlinVersion", "1.1.7")
 
-        set("springBootVersion", "2.7.1")
-        set("springFrameworkVersion", "5.3.21")
+        set("springBootVersion", "2.7.2")
+        set("springFrameworkVersion", "5.3.22")
 //        set("springSecurityVersion", "5.7.2")
 
         set("jacksonVersion", "2.13.3")
@@ -166,7 +166,11 @@ tasks.wrapper {
 }
 
 //FIXME: exclude rootProject build directory (alternative will be available in gradle 7.6)
-//tasks.forEach { it.enabled = false }
+tasks.forEach {
+    if (it.name !in listOf("wrapper")) {
+        it.enabled = false
+    }
+}
 gradle.buildFinished {
     buildDir.deleteRecursively()
 }
