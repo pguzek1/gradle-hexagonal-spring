@@ -161,8 +161,12 @@ subprojects {
     }
 }
 
+tasks.wrapper {
+    gradleVersion = "7.5.1"
+}
+
 //FIXME: exclude rootProject build directory (alternative will be available in gradle 7.6)
-tasks.forEach { it.enabled = false }
+//tasks.forEach { it.enabled = false }
 gradle.buildFinished {
     buildDir.deleteRecursively()
 }
