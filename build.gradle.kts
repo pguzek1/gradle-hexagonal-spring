@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.7.10"
     id("org.jetbrains.kotlin.plugin.spring") version "1.7.10" apply false
-    id("org.springframework.boot") version "2.7.2" apply false
+    id("org.springframework.boot") version "3.0.1" apply false
     id("pl.allegro.tech.build.axion-release") version "1.14.0"
     id("jvm-test-suite")
     id("idea")
