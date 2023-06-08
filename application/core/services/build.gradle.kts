@@ -1,6 +1,7 @@
 group = "${group}.core"
 
 dependencies {
-    implementation(project(":core-domain"))
-    implementation(project(":application-ports"))
+    api(project(":core-domain"))
+    api(project(":ports-driven"))
+    api(project(":ports-driving"))
 }
