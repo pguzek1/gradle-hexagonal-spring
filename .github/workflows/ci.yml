@@ -8,7 +8,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  qodana:
+  build:
+    name: Build & Release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
